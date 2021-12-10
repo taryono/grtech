@@ -7,7 +7,7 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
 
-class EmployeeCreated extends Notification
+class CompanyCreated extends Notification
 {
     //use Queueable;
 
@@ -41,7 +41,7 @@ class EmployeeCreated extends Notification
     public function toMail($notifiable)
     {   try {
         return (new MailMessage) 
-                    ->subject('Employee data has been created.')
+                    ->subject('Company data has been created.')
                     ->line('Thank you for using our application!');
         }catch(\Exception $e){
             dd($e);

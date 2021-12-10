@@ -342,52 +342,19 @@
     <script src="{{ asset('dist/js/adminlte.min.js') }}"></script>
     <!-- AdminLTE for demo purposes -->
     <script src="{{ asset('dist/js/demo.js') }}"></script>
+    <script src="{{ asset('js/apps.js') }}"></script>
     <!-- Page specific script -->
     @yield('scripts')
     <script>
-        $(function() { 
-            $(window).on("load", function() {
-                $.each($("img.image-logo"), function(){ 
-                     $(this).attr("onerror", "this.src='{{(asset('assets/images/company.png'))}}'");
-                 });
-            });
-
-            $("#employee").DataTable({
-                "responsive": true,
-                "lengthChange": false, 
-                "processing": true,
-                "serverSide": true,
-                "ajax": "{{route('employee.index')}}",
-                "columns": [
-                    // data:column name from server ,name:alias
-                    {data: 'DT_RowIndex', name: 'id'},
-                    {data: 'full_name', name: 'full_name'},
-                    {data: 'email', name: 'email'},
-                    {data: 'phone', name: 'phone'},
-                    {data: 'company', name: 'company'}, 
-                    {data: 'action', name: 'action', orderable: false, searchable: false},
-                ]
-            });
-
-            $("#company").DataTable({
-                "responsive": true,
-                "lengthChange": false, 
-                "processing": true,
-                "serverSide": true,
-                "ajax": "{{route('company.index')}}",
-                "columns": [
-                    {data: 'DT_RowIndex', name: 'id'},
-                    {data: 'name', name: 'name'},
-                    {data: 'email', name: 'email'},
-                    {data: 'logo', name: 'logo'},
-                    {data: 'website', name: 'website'},
-                    {data: 'action', name: 'action', orderable: false, searchable: false},
-                ]
-            });
-
+        $(function() {  
+            @if(Auth::user()->isAdmin())
+                loadCompany();
+                loadEmployee();
+            @endif
             $("body").on('click','a.detail,a.edit', function(e){
                 e.preventDefault();
                 $target = $(this).attr('data-target');
+                $($target+" div.modal-body").html('');
                 $($target+" h4.modal-title").text($(this).attr('data-title'));
                 $.ajax({
                     url:$(this).attr('href'),
@@ -420,13 +387,35 @@
                 }
             }).on('click','button.submit-form', function(e){
                 e.preventDefault(); 
+                var formData = new FormData($('form.form-horizontal')[0]);
                 $.ajax({
-                        url:$(this).parent().closest('form').attr('action'),
-                        type:"PUT",  
-                        data: $(this).parent().closest('form').serialize(),
+                        url:$('form.form-horizontal').attr('action'), 
+                        data: formData,
+                        type: "POST",
+                        processData: false,
+                        contentType: false,
                         success:function(res){
                             message(res.status, res.message);
                             $("button.close").click();
+                            window.location.reload();
+                        },
+                        error:function(res){
+                            message('error', res.responseText);
+                        }
+                    });
+            }).on('click','button.update-form', function(e){
+                e.preventDefault(); 
+                var formData = new FormData($('form.form-horizontal')[0]);
+                $.ajax({
+                        url:$('form.form-horizontal').attr('action'), 
+                        data: formData,
+                        type: "PUT",
+                        processData: false,
+                        contentType: false,
+                        success:function(res){
+                            message(res.status, res.message);
+                            $("button.close").click();
+                            window.location.reload();
                         },
                         error:function(res){
                             message('error', res.responseText);
@@ -434,6 +423,43 @@
                     });
             });
         });
+
+        function loadEmployee(){
+            $("#employee").DataTable({
+                "responsive": true,
+                "lengthChange": false, 
+                "processing": true,
+                "serverSide": true,
+                "ajax": "{{route('employee.index')}}",
+                "columns": [
+                    // data:column name from server ,name:alias
+                    {data: 'DT_RowIndex', name: 'id'},
+                    {data: 'full_name', name: 'full_name'},
+                    {data: 'email', name: 'email'},
+                    {data: 'phone', name: 'phone'},
+                    {data: 'company', name: 'company'}, 
+                    {data: 'action', name: 'action', orderable: false, searchable: false},
+                ]
+            });
+        }
+
+        function loadCompany(){
+            $("#company").DataTable({
+                "responsive": true,
+                "lengthChange": false, 
+                "processing": true,
+                "serverSide": true,
+                "ajax": "{{route('company.index')}}",
+                "columns": [
+                    {data: 'DT_RowIndex', name: 'id'},
+                    {data: 'name', name: 'name'},
+                    {data: 'email', name: 'email'},
+                    {data: 'logo', name: 'logo'},
+                    {data: 'website', name: 'website'},
+                    {data: 'action', name: 'action', orderable: false, searchable: false},
+                ]
+            });
+        }
     </script>
 </body>
 

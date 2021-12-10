@@ -6,6 +6,10 @@ use App\Models\Company as company;
 use Illuminate\Http\Request;
 use App\Http\Controllers\MainController;
 use DataTables;
+use Lib\File;
+use App\Notifications\CompanyCreated;
+use Illuminate\Support\Facades\Notification;
+use Illuminate\Support\Facades\Validator;
        
 class CompanyController extends MainController
 {
@@ -33,7 +37,7 @@ class CompanyController extends MainController
                     })
                     ->addColumn('logo', function($row){
      
-                        $logo = '<img src="'.($row->logo?$row->logo:(asset('assets/images/company.png'))).'" class="img-responsive image-logo" data-title="'.($row->name).'" width="100px">';
+                        $logo = '<img src="'.($row->logo?asset('logo/'.$row->logo):(asset('assets/images/company.png'))).'" class="img-responsive image-logo" data-title="'.($row->name).'" width="100px">';
                          return $logo;
                     })
                     ->rawColumns(['action','logo'])
@@ -50,7 +54,7 @@ class CompanyController extends MainController
      */
     public function create()
     {
-        //
+        return view('Company::create');
     }
 
     /**
@@ -60,8 +64,42 @@ class CompanyController extends MainController
      * @return \Illuminate\Http\Response
      */
     public function store(Request $request)
-    {
-        //
+    {   
+        try {
+            $validator = Validator::make($request->all(), [
+                'email' => 'required|unique:companies',
+                'name' => 'required',
+            ]);
+            if($validator->fails()){
+                return response()->json(['status'=> 'failed', 'message'=> 'Input not Valid.']);
+            }
+            $company = new company();
+            $company = $company->create($this->serialize($request->input(), new company())); 
+            if ($request->file('logo')) {                
+                $this->validate($request, [
+                    'name' => 'required',
+                    'logo' => 'image|mimes:jpeg,png,jpg,gif,svg|max:2048',
+                ]); 
+                
+                if ($request->file('logo')->isValid()) {
+                    $file = $request->file('logo');
+                    // image upload in storage/app/app/public/logo   
+                    $info = File::storeLocalFile($file, File::createLocalDirectory(storage_path('app/public/logo')));
+                    if($company->logo && file_exists(storage_path('app/public/logo/'.$company->logo))){
+                        unlink(storage_path('app/public/logo/'.$company->logo));
+                    }
+                    $company->logo = $info->getFilename(); 
+                    $company->save();
+                } else {
+                    return response()->json(['status' => 'error', 'message' => 'Image not allowed to upload.'], 200);
+                }
+            }
+            $company->notify(new CompanyCreated());
+            //Notification::send($company, new CompanyCreated());
+        } catch (\Exception $e) {
+            return response()->json(['status' => 'error', 'message' => 'Image upload error => '. $e->getMessage()], 200); 
+        }
+        return response()->json(['status' => 'success', 'message' => 'Data Successfully Added.'], 200); 
     }
 
     /**
@@ -95,15 +133,35 @@ class CompanyController extends MainController
      * @return \Illuminate\Http\Response
      */
     public function update(Request $request, $company_id)
-    {
-        $company = company::find($company_id);
-        if($company){
-            $company->update([
-                'name'=> $request->name,
-                'email'=> $request->email,
-                'website'=> $request->website, 
-            ]);
+    { 
+        try {
+            $company = company::find($company_id);
+            if($company){ 
+                $company->update($this->serialize($request->input(), $this->model));
+                 
+                if ($request->file('logo')) {                
+                    $this->validate($request, [
+                        'name' => 'required',
+                        'logo' => 'image|mimes:jpeg,png,jpg,gif,svg|max:2048',
+                    ]); 
+                    if ($request->file('logo')->isValid()) {
+                        $file = $request->file('logo');
+                        // image upload in storage/app/app/public/logo   
+                        $info = File::storeLocalFile($file, File::createLocalDirectory(storage_path('app/public/logo')));
+                        if($company->logo && file_exists(storage_path('app/public/logo/'.$company->logo))){
+                            unlink(storage_path('app/public/logo/'.$company->logo));
+                        }
+                        $company->logo = $info->getFilename(); 
+                        $company->save();
+                    } else {
+                        return response()->json(['status' => 'error', 'message' => 'Image not allowed to upload.'], 200);
+                    }
+                }
+            }
+        } catch (\Exception $e) {
+            return response()->json(['status' => 'error', 'message' => 'Image upload error => '. $e->getMessage()], 200); 
         }
+        return response()->json(['status' => 'success', 'message' => 'Data was updated.'], 200); 
     }
 
     /**
@@ -112,8 +170,16 @@ class CompanyController extends MainController
      * @param  \App\Models\Company  $company
      * @return \Illuminate\Http\Response
      */
-    public function destroy(Company $company)
+    public function destroy($company_id)
     {
-        //
+        try {
+            $company = $this->model->find($company_id);
+            if($company){
+                $company->delete(); 
+            }
+        } catch (\Throwable $e) {
+            return response()->json(['status'=> 'failed', 'message'=> 'Data Error '.$e->getMessage()], 200);
+        }
+        return response()->json(['status'=> 'success', 'message'=> 'Data Was Deleted.'], 200);
     }
 }

@@ -53,7 +53,7 @@ class EmployeeController extends MainController
      */
     public function create()
     {
-        //
+        return view('Employee::create');
     }
 
     /**
@@ -63,8 +63,15 @@ class EmployeeController extends MainController
      * @return \Illuminate\Http\Response
      */
     public function store(Request $request)
-    {
-        //
+    {   
+        try {
+            $employee = new employee();
+            $employee = $employee->create($this->serialize($request->input(), new employee())); 
+             
+        } catch (\Exception $e) {
+            return response()->json(['status' => 'error', 'message' => 'Image upload error => '. $e->getMessage()], 200); 
+        }
+        return response()->json(['status' => 'success', 'message' => 'Data Successfully Added.'], 200); 
     }
 
     /**
@@ -122,7 +129,7 @@ class EmployeeController extends MainController
                 ]);
             }
         } catch (\Throwable $e) {
-            return response()->json(['status'=> 'failed', 'message'=> 'Update Data Error '.$e->message()]);
+            return response()->json(['status'=> 'failed', 'message'=> 'Update Data Error '.$e->getMessage()]);
         }
         return response()->json(['status'=> 'success', 'message'=> 'Data Was Updated.']);
 
@@ -142,8 +149,8 @@ class EmployeeController extends MainController
                 $employee->delete(); 
             }
         } catch (\Throwable $e) {
-            return response()->json(['status'=> 'failed', 'message'=> 'Data Error '.$e->message()]);
+            return response()->json(['status'=> 'failed', 'message'=> 'Data Error '.$e->getMessage()], 200);
         }
-        return response()->json(['status'=> 'success', 'message'=> 'Data Was Deleted.']);
+        return response()->json(['status'=> 'success', 'message'=> 'Data Was Deleted.'], 200);
     }
 }

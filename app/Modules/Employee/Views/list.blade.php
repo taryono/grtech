@@ -16,7 +16,17 @@
           <div class="col-12">
             <div class="card">
               <div class="card-header">
-                <h3 class="card-title">List Employees</h3>
+                <div class="row">
+                  <div class="col-2">
+                    <h3 class="card-title">List Employees</h3>
+                  </div>
+                  <div class="col-9">
+                    
+                  </div>
+                  <div class="col-1">
+                    <a href="{{route('employee.create')}}" class="edit btn btn-block btn-primary btn-sm col-xs-3" data-toggle="modal" data-target="#modal-detail" data-title="Add Employee">Add </a>                   
+                  </div>
+                </div>
               </div>
               <!-- /.card-header -->
               <div class="card-body">
@@ -49,6 +59,4 @@
       </div>
       <!-- /.container-fluid -->
     </section>
-    <!-- /.content -->
-   
-  
+    <!-- /.content --> 

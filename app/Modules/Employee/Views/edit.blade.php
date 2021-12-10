@@ -4,9 +4,9 @@
     </div>
     <!-- /.card-header -->
     <!-- form start -->
-    <form action="{{route('employee.update', $employee->id)}}" method="POST">
+    <form action="{{route('employee.update', $employee->id)}}" class="form-horizontal" method="POST" enctype="multipart/form-data">
         @csrf
-        <input type="hidden" name="_method" name="id" value="PUT">
+        <input type="hidden" name="_method" value="PUT">
       <div class="card-body">
         <div class="form-group">
           <label for="first_name">First Name</label>
@@ -37,7 +37,7 @@
       <!-- /.card-body -->
 
       <div class="card-footer">
-        <button type="submit" class="btn btn-primary submit-form">Submit</button>
+        <button type="submit" class="btn btn-primary update-form">Submit</button>
       </div>
     </form>
   </div>

@@ -24,7 +24,7 @@ class EmployeeController extends MainController
         if ($request->ajax()) {
             $employees = employee::select('*');
             return Datatables::of($employees)
-                    ->addIndexColumn('index')
+                    ->addIndexColumn()
                     ->addColumn('action', function($row){
      
                            $btn = '<div class="justify-content-between"><a href="'.(route('employee.edit',$row->id)).'" class="edit btn btn-primary btn-sm" data-toggle="modal" data-target="#modal-edit" data-title="'.($row->full_name()).'">Edit</a>';
@@ -39,7 +39,7 @@ class EmployeeController extends MainController
                     ->addColumn('full_name', function($row){ 
                         return $row->full_name();
                     }) 
-                    ->rawColumns(['action','company','index'])
+                    ->rawColumns(['action','company'])
                     ->make(true);
         }
         

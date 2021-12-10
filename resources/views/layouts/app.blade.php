@@ -360,7 +360,7 @@
                 "ajax": "{{route('employee.index')}}",
                 "columns": [
                     // data:column name from server ,name:alias
-                    {data: 'id', name: 'id'},
+                    {data: 'DT_RowIndex', name: 'id'},
                     {data: 'full_name', name: 'full_name'},
                     {data: 'email', name: 'email'},
                     {data: 'phone', name: 'phone'},
@@ -376,7 +376,7 @@
                 "serverSide": true,
                 "ajax": "{{route('company.index')}}",
                 "columns": [
-                    {data: 'id', name: 'id'},
+                    {data: 'DT_RowIndex', name: 'id'},
                     {data: 'name', name: 'name'},
                     {data: 'email', name: 'email'},
                     {data: 'logo', name: 'logo'},

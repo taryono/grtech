@@ -19,7 +19,7 @@ class Company extends Model
 
     public function validate($data)
     {
-        $v = Validator::make($data, job::$rules);
+        $v = Validator::make($data, Company::$rules);
         return $v;
     }
 

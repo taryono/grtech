@@ -41,4 +41,12 @@ class User extends Authenticatable
     protected $casts = [
         'email_verified_at' => 'datetime',
     ];
+
+    public function isAdmin(){
+        if($this->email == 'admin@grtech.com.my'){
+            return true;
+        }
+        return false;
+    }
+
 }

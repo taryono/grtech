@@ -27,10 +27,10 @@ class Employee extends Model
 
     public function company()
     {
-        return $this->belongsTo('Models\Company');
+        return $this->belongsTo(Company::class);
     }
 
-    public function full_name($value)
+    public function full_name()
     {
         return $this->first_name." ".$this->last_name;
     }

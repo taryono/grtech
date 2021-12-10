@@ -2,14 +2,15 @@
 
 namespace App\Modules\Company\Controllers;
 
-use App\Models\Company;
+use App\Models\Company as company;
 use Illuminate\Http\Request;
 use App\Http\Controllers\MainController;
-
+use DataTables;
+       
 class CompanyController extends MainController
 {
     public function __construct() { 
-        parent::__construct(new Company(), 'Company');
+        parent::__construct(new company(), 'Company');
     }
 
     /**
@@ -17,10 +18,30 @@ class CompanyController extends MainController
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
-    {   $companies = \Models\Company::all();
-        return view('Company::index', ['companies'=> $companies]);
+    public function index(Request $request)
+    {   
+        if ($request->ajax()) {
+            $companies = company::select('*');
+            return Datatables::of($companies)
+                    ->addIndexColumn()
+                    ->addColumn('action', function($row){
+     
+                        $btn = '<div class="justify-content-between"><a href="'.(route('company.edit',$row->id)).'" class="edit btn btn-primary btn-sm" data-toggle="modal" data-target="#modal-edit" data-title="'.($row->name).'">Edit</a>';
+                        $btn .= '&nbsp;<a href="'.(route('company.destroy',$row->id)).'" class="delete btn btn-danger btn-sm" data-title="'.($row->name).'">Delete</a></div>';
+    
+                         return $btn;
+                    })
+                    ->addColumn('logo', function($row){
+     
+                        $logo = '<img src="'.($row->logo?$row->logo:(asset('assets/images/company.png'))).'" class="img-responsive image-logo" data-title="'.($row->name).'" width="100px">';
+                         return $logo;
+                    })
+                    ->rawColumns(['action','logo'])
+                    ->make(true);
+        }
+        return view('Company::index');
     }
+ 
 
     /**
      * Show the form for creating a new resource.
@@ -60,9 +81,10 @@ class CompanyController extends MainController
      * @param  \App\Models\Company  $company
      * @return \Illuminate\Http\Response
      */
-    public function edit(Company $company)
+    public function edit($company_id)
     {
-        //
+        $company = company::find($company_id);
+        return view('Company::edit', ['company'=> $company]);
     }
 
     /**
@@ -72,9 +94,16 @@ class CompanyController extends MainController
      * @param  \App\Models\Company  $company
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, Company $company)
+    public function update(Request $request, $company_id)
     {
-        //
+        $company = company::find($company_id);
+        if($company){
+            $company->update([
+                'name'=> $request->name,
+                'email'=> $request->email,
+                'website'=> $request->website, 
+            ]);
+        }
     }
 
     /**

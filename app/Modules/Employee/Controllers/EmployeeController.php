@@ -69,7 +69,7 @@ class EmployeeController extends MainController
             $employee = $employee->create($this->serialize($request->input(), new employee())); 
              
         } catch (\Exception $e) {
-            return response()->json(['status' => 'error', 'message' => 'Image upload error => '. $e->getMessage()], 200); 
+            return response()->json(['status' => 'error', 'message' => 'Add data error => '. $e->getMessage()], 200); 
         }
         return response()->json(['status' => 'success', 'message' => 'Data Successfully Added.'], 200); 
     }
@@ -121,15 +121,15 @@ class EmployeeController extends MainController
             $employee = employee::find($employee_id);
             if($employee){
                 $employee->update([
-                    'first_name'=> $request->first_name,
-                    'last_name'=> $request->last_name,
-                    'email'=> $request->email,
-                    'phone'=> $request->phone, 
-                    'company_id'=> $request->company_id, 
+                    'first_name'=> $request->input('first_name'),
+                    'last_name'=> $request->input('last_name'),
+                    'email'=> $request->input('email'),
+                    'phone'=> $request->input('phone'), 
+                    'company_id'=> $request->input('company_id'), 
                 ]);
             }
-        } catch (\Throwable $e) {
-            return response()->json(['status'=> 'failed', 'message'=> 'Update Data Error '.$e->getMessage()]);
+        } catch (\Exception $e) {
+            return response()->json(['status'=> 'error', 'message'=> 'Update Data Error '.$e->getMessage()]);
         }
         return response()->json(['status'=> 'success', 'message'=> 'Data Was Updated.']);
 

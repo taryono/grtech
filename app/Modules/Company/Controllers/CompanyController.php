@@ -97,7 +97,7 @@ class CompanyController extends MainController
             $company->notify(new CompanyCreated());
             //Notification::send($company, new CompanyCreated());
         } catch (\Exception $e) {
-            return response()->json(['status' => 'error', 'message' => 'Image upload error => '. $e->getMessage()], 200); 
+            return response()->json(['status' => 'error', 'message' => 'Add Data Error '. $e->getMessage()], 200); 
         }
         return response()->json(['status' => 'success', 'message' => 'Data Successfully Added.'], 200); 
     }
@@ -133,7 +133,8 @@ class CompanyController extends MainController
      * @return \Illuminate\Http\Response
      */
     public function update(Request $request, $company_id)
-    { 
+    {    $input = $request->all();
+        dd($input);
         try {
             $company = company::find($company_id);
             if($company){ 
